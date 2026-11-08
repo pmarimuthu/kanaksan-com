@@ -11,14 +11,6 @@
           "url": "https://learn.kanaksan.com",
           "icon": "📘",
           "status": "live"
-        },
-        {
-          "id": "blog",
-          "name": "Tech Blog",
-          "summary": "OFSAA / FCCM articles",
-          "url": "https://blog.kanaksan.com",
-          "icon": "✍️",
-          "status": "soon"
         }
       ]
     },
@@ -33,14 +25,6 @@
           "url": "https://calendar.kanaksan.com",
           "icon": "🗓️",
           "status": "live"
-        },
-        {
-          "id": "event",
-          "name": "Annadhanam Booking",
-          "summary": "Book & manage seva slots",
-          "url": "https://event.kanaksan.com",
-          "icon": "🍛",
-          "status": "soon"
         }
       ]
     },
@@ -54,15 +38,7 @@
           "summary": "Tamil Nadu live results",
           "url": "https://vote.kanaksan.com",
           "icon": "🗳️",
-          "status": "soon"
-        },
-        {
-          "id": "bmtc",
-          "name": "BMTC Bus Tracker",
-          "summary": "Android app",
-          "url": "",
-          "icon": "🚌",
-          "status": "soon"
+          "status": "live"
         }
       ]
     }

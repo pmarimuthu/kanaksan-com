@@ -6,7 +6,10 @@
  */
 import products from '../data/products.json';
 
-const statusLabel: Record<string, string> = { live: 'Live', beta: 'Beta', soon: 'Coming soon' };
+// Only released apps are shown: status "live" or "beta" with a URL. Empty groups are hidden.
+const groups = products.groups
+  .map((g) => ({ ...g, items: g.items.filter((i) => (i.status === 'live' || i.status === 'beta') && i.url) }))
+  .filter((g) => g.items.length > 0);
 ---
 <div id="apps-menu" popover class="sheet" aria-label="Kanaksan apps">
   <div class="sheet-head">
@@ -15,39 +18,22 @@ const statusLabel: Record<string, string> = { live: 'Live', beta: 'Beta', soon: 
     <button class="close" popovertarget="apps-menu" popovertargetaction="hide" aria-label="Close apps menu">✕</button>
   </div>
 
-  {products.groups.map((g) => (
+  {groups.map((g) => (
     <section class="grp" aria-labelledby={`grp-${g.id}`}>
       <h2 id={`grp-${g.id}`}>{g.label}</h2>
       <ul>
-        {g.items.map((item) => {
-          const linked = item.status !== 'soon' && item.url;
-          return (
-            <li>
-              {linked ? (
-                <a class="item" href={item.url}>
-                  <span class="ico" aria-hidden="true">{item.icon}</span>
-                  <span class="txt"><span class="name">{item.name}</span><span class="sum">{item.summary}</span></span>
-                  <span class={`dot ${item.status}`} title={statusLabel[item.status]}><span class="sr-only">{statusLabel[item.status]}</span></span>
-                </a>
-              ) : (
-                <div class="item off" aria-disabled="true">
-                  <span class="ico" aria-hidden="true">{item.icon}</span>
-                  <span class="txt"><span class="name">{item.name}</span><span class="sum">{item.summary}</span></span>
-                  <span class="tag">{statusLabel[item.status]}</span>
-                </div>
-              )}
-            </li>
-          );
-        })}
+        {g.items.map((item) => (
+          <li>
+            <a class="item" href={item.url}>
+              <span class="ico" aria-hidden="true">{item.icon}</span>
+              <span class="txt"><span class="name">{item.name}</span><span class="sum">{item.summary}</span></span>
+              {item.status === 'beta' ? <span class="tag">Beta</span> : <span class="go" aria-hidden="true">›</span>}
+            </a>
+          </li>
+        ))}
       </ul>
     </section>
   ))}
-
-  <p class="legend" aria-hidden="true">
-    <span><span class="dot live"></span>Live</span>
-    <span><span class="dot beta"></span>Beta</span>
-    <span><span class="dot soon"></span>Coming soon</span>
-  </p>
 </div>
 
 <style>
@@ -72,18 +58,13 @@ const statusLabel: Record<string, string> = { live: 'Live', beta: 'Beta', soon: 
     border-radius: 12px; color: var(--text); text-decoration: none;
   }
   a.item:hover { background: color-mix(in srgb, var(--primary) 9%, transparent); }
-  .item.off { opacity: .62; }
   .ico { font-size: 22px; width: 28px; text-align: center; }
   .txt { display: flex; flex-direction: column; flex: 1; min-width: 0; }
   .name { font-weight: 600; }
   .sum { font-size: 13px; color: var(--muted); }
-  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex: none; }
-  .dot.live { background: var(--live); }
-  .dot.beta { background: var(--beta); }
-  .dot.soon { background: transparent; border: 2px solid var(--soon); }
-  .tag { font-size: 12px; color: var(--muted); white-space: nowrap; }
-  .legend { display: flex; gap: 14px; margin: 14px 0 4px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
-  .legend > span { display: inline-flex; align-items: center; gap: 6px; }
+  .go { font-size: 22px; line-height: 1; color: var(--muted); }
+  .tag { font-size: 12px; font-weight: 600; color: var(--beta); border: 1px solid currentColor; border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+  .grp + .grp { border-top: 1px solid var(--border); margin-top: 8px; }
 
   /* Desktop = dropdown under header */
   @media (min-width: 1024px) {
