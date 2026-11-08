@@ -11,6 +11,14 @@
           "url": "https://learn.kanaksan.com",
           "icon": "📘",
           "status": "live"
+        },
+        {
+          "id": "logiclab",
+          "name": "LogicLab",
+          "summary": "Logic gates with real-life examples",
+          "url": "https://logiclab.kanaksan.com",
+          "icon": "🔌",
+          "status": "live"
         }
       ]
     },
