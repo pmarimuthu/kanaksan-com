@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Privacy — Kanaksan" description="How kanaksan.com handles your data." path="/privacy">
+  <article class="wrap doc">
+    <h1>Privacy</h1>
+    <p>kanaksan.com does not ask you to sign in and does not set cookies.</p>
+    <p>Your light or dark theme choice is saved only in your own browser (local storage). You can clear it at any time from your browser settings.</p>
+    <p>The site is hosted on Vercel. Like any web host, Vercel may keep standard server logs (such as IP address and browser type) for security and performance.</p>
+    <p>Each Kanaksan app (for example learn.kanaksan.com or calendar.kanaksan.com) may have its own privacy notice.</p>
+    <p>Last updated: 8 November 2026.</p>
+  </article>
+</Base>
+
+<style>
+  .doc { max-width: 720px; padding-block: 32px 48px; }
+  .doc h1 { font-size: clamp(26px, 6vw, 36px); margin: 0 0 16px; }
+  .doc p { color: var(--text); }
+</style>

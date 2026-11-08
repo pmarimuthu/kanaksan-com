@@ -1,0 +1,103 @@
+---
+/**
+ * Spotlight: the only content block on the page.
+ * The state (content or fallback) is decided on the server, so the browser
+ * gets the final HTML — no loading state, no swap, no layout jump.
+ */
+import type { Spotlight } from '../lib/spotlight';
+
+interface Props { data: Spotlight }
+const { data } = Astro.props;
+const hasMobile = data.kind === 'content' && !!data.srcMobile;
+---
+<section class="spot wrap" aria-label="Spotlight">
+  {data.kind === 'content' ? (
+    <figure class="frame-wrap">
+      <h1 class="sr-only">Kanaksan — simple, free tools for students &amp; developers</h1>
+      {(() => {
+        const pic = (
+          <picture class:list={['frame', { m: hasMobile }]}>
+            {hasMobile && <source media="(min-width: 1024px)" srcset={data.src} />}
+            <img
+              src={hasMobile ? data.srcMobile : data.src}
+              alt={data.alt}
+              width="1600" height="900"
+              fetchpriority="high" decoding="async"
+            />
+          </picture>
+        );
+        return data.link ? <a href={data.link}>{pic}</a> : pic;
+      })()}
+      {data.caption && <figcaption>{data.caption}</figcaption>}
+    </figure>
+  ) : (
+    <div class="fallback">
+      <div class="art" aria-hidden="true">
+        <svg viewBox="0 0 640 360" width="640" height="360" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#1E3A8A" />
+              <stop offset="1" stop-color="#312E81" />
+            </linearGradient>
+            <radialGradient id="g2" cx=".78" cy=".22" r=".6">
+              <stop offset="0" stop-color="#F2C14E" stop-opacity=".55" />
+              <stop offset="1" stop-color="#F2C14E" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+          <rect width="640" height="360" fill="url(#g1)" />
+          <rect width="640" height="360" fill="url(#g2)" />
+          <g fill="none" stroke="#F2C14E" stroke-opacity=".35" stroke-width="1.5">
+            <circle cx="500" cy="80" r="40" /><circle cx="500" cy="80" r="80" /><circle cx="500" cy="80" r="130" />
+          </g>
+          <g fill="#FFFFFF" fill-opacity=".12">
+            <rect x="60" y="210" width="90" height="90" rx="18" />
+            <rect x="170" y="210" width="90" height="90" rx="18" />
+            <rect x="280" y="210" width="90" height="90" rx="18" />
+          </g>
+          <g font-size="44" text-anchor="middle" font-family="system-ui, sans-serif">
+            <text x="105" y="272">📘</text><text x="215" y="272">🗓️</text><text x="325" y="272">🛠️</text>
+          </g>
+          <path d="M70 120v70M70 155l38-35M83 145l33 45" stroke="#F2C14E" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+        </svg>
+      </div>
+      <div class="copy">
+        <h1>Simple, free tools for students &amp; developers.</h1>
+        <p>Learning aids, a Tamil daily calendar and more — all in one place.</p>
+        <button class="btn" popovertarget="apps-menu">Explore apps</button>
+      </div>
+    </div>
+  )}
+</section>
+
+<style>
+  .spot { flex: 1; display: flex; flex-direction: column; justify-content: center; padding-block: 20px 28px; }
+  @media (min-width: 1024px) { .spot { padding-block: 40px 48px; } }
+
+  /* Content state */
+  .frame-wrap { margin: 0; }
+  .frame {
+    display: block; width: 100%; aspect-ratio: 16 / 9; overflow: hidden;
+    border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow);
+  }
+  .frame.m { aspect-ratio: 4 / 5; }
+  @media (min-width: 1024px) { .frame.m { aspect-ratio: 16 / 9; } }
+  .frame img { width: 100%; height: 100%; object-fit: contain; }
+  figcaption { margin-top: 14px; text-align: center; font-size: clamp(18px, 4.5vw, 24px); font-weight: 700; }
+
+  /* Fallback state */
+  .fallback { text-align: center; }
+  .art {
+    width: 100%; aspect-ratio: 16 / 9; overflow: hidden;
+    border-radius: var(--radius); box-shadow: var(--shadow);
+  }
+  .art svg { width: 100%; height: 100%; }
+  .fallback h1 { margin: 22px auto 8px; max-width: 18ch; font-size: clamp(26px, 7vw, 44px); line-height: 1.15; letter-spacing: -.01em; }
+  .fallback p { margin: 0 auto 20px; max-width: 42ch; color: var(--muted); font-size: clamp(16px, 3.8vw, 18px); }
+  @media (min-width: 1024px) {
+    .fallback { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: center; text-align: left; }
+    .art { order: 2; }
+    .copy { order: 1; }
+    .fallback h1 { margin: 0 0 14px; }
+    .fallback p { margin: 0 0 28px; }
+  }
+</style>

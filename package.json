@@ -1,0 +1,20 @@
+{
+  "name": "kanaksan-com",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "kanaksan.com - main hub for the Kanaksan suite",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "node --test --experimental-strip-types src/lib/*.test.ts"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.4.7"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

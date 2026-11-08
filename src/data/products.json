@@ -1,0 +1,75 @@
+{
+  "groups": [
+    {
+      "id": "learn",
+      "label": "Learn",
+      "items": [
+        {
+          "id": "learn",
+          "name": "Students' Companion",
+          "summary": "Class 11 Physics notes & simulations",
+          "url": "https://learn.kanaksan.com",
+          "icon": "📘",
+          "status": "live"
+        },
+        {
+          "id": "blog",
+          "name": "Tech Blog",
+          "summary": "OFSAA / FCCM articles",
+          "url": "https://blog.kanaksan.com",
+          "icon": "✍️",
+          "status": "soon"
+        }
+      ]
+    },
+    {
+      "id": "community",
+      "label": "Community",
+      "items": [
+        {
+          "id": "calendar",
+          "name": "Tamil Calendar",
+          "summary": "Daily panchangam in Tamil & English",
+          "url": "https://calendar.kanaksan.com",
+          "icon": "🗓️",
+          "status": "live"
+        },
+        {
+          "id": "event",
+          "name": "Annadhanam Booking",
+          "summary": "Book & manage seva slots",
+          "url": "https://event.kanaksan.com",
+          "icon": "🍛",
+          "status": "soon"
+        }
+      ]
+    },
+    {
+      "id": "civic",
+      "label": "Civic",
+      "items": [
+        {
+          "id": "vote",
+          "name": "Vote (Exit Poll)",
+          "summary": "Tamil Nadu live results",
+          "url": "https://vote.kanaksan.com",
+          "icon": "🗳️",
+          "status": "soon"
+        },
+        {
+          "id": "bmtc",
+          "name": "BMTC Bus Tracker",
+          "summary": "Android app",
+          "url": "",
+          "icon": "🚌",
+          "status": "soon"
+        }
+      ]
+    }
+  ],
+  "profiles": {
+    "author": "https://author.kanaksan.com",
+    "github": "https://github.com/pmarimuthu",
+    "linkedin": "https://www.linkedin.com/in/marisp"
+  }
+}

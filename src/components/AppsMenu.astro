@@ -1,0 +1,98 @@
+---
+/**
+ * Apps menu: native HTML popover. Works from first paint with zero JavaScript.
+ * Mobile: bottom sheet. Desktop (>=1024px): dropdown under the header.
+ * All links are in the server HTML, so search engines can crawl them.
+ */
+import products from '../data/products.json';
+
+const statusLabel: Record<string, string> = { live: 'Live', beta: 'Beta', soon: 'Coming soon' };
+---
+<div id="apps-menu" popover class="sheet" aria-label="Kanaksan apps">
+  <div class="sheet-head">
+    <span class="handle" aria-hidden="true"></span>
+    <strong>Kanaksan apps</strong>
+    <button class="close" popovertarget="apps-menu" popovertargetaction="hide" aria-label="Close apps menu">✕</button>
+  </div>
+
+  {products.groups.map((g) => (
+    <section class="grp" aria-labelledby={`grp-${g.id}`}>
+      <h2 id={`grp-${g.id}`}>{g.label}</h2>
+      <ul>
+        {g.items.map((item) => {
+          const linked = item.status !== 'soon' && item.url;
+          return (
+            <li>
+              {linked ? (
+                <a class="item" href={item.url}>
+                  <span class="ico" aria-hidden="true">{item.icon}</span>
+                  <span class="txt"><span class="name">{item.name}</span><span class="sum">{item.summary}</span></span>
+                  <span class={`dot ${item.status}`} title={statusLabel[item.status]}><span class="sr-only">{statusLabel[item.status]}</span></span>
+                </a>
+              ) : (
+                <div class="item off" aria-disabled="true">
+                  <span class="ico" aria-hidden="true">{item.icon}</span>
+                  <span class="txt"><span class="name">{item.name}</span><span class="sum">{item.summary}</span></span>
+                  <span class="tag">{statusLabel[item.status]}</span>
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  ))}
+
+  <p class="legend" aria-hidden="true">
+    <span><span class="dot live"></span>Live</span>
+    <span><span class="dot beta"></span>Beta</span>
+    <span><span class="dot soon"></span>Coming soon</span>
+  </p>
+</div>
+
+<style>
+  /* Base = mobile bottom sheet */
+  .sheet {
+    position: fixed; inset: auto 0 0 0; margin: 0; width: 100%;
+    max-height: 82dvh; overflow-y: auto; overscroll-behavior: contain;
+    padding: 8px var(--gutter) max(16px, env(safe-area-inset-bottom));
+    background: var(--surface); color: var(--text);
+    border: 1px solid var(--border); border-bottom: 0; border-radius: 20px 20px 0 0;
+    box-shadow: var(--shadow);
+  }
+  .sheet::backdrop { background: rgba(14, 20, 36, .45); }
+  .sheet-head { position: relative; display: flex; align-items: center; justify-content: space-between; padding: 14px 0 6px; }
+  .handle { position: absolute; top: 2px; left: 50%; width: 40px; height: 4px; margin-left: -20px; border-radius: 4px; background: var(--border); }
+  .close { min-width: 48px; min-height: 48px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-size: 18px; cursor: pointer; }
+  .close:hover { background: color-mix(in srgb, var(--text) 7%, transparent); }
+  .grp h2 { margin: 14px 0 4px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  ul { list-style: none; margin: 0; padding: 0; }
+  .item {
+    display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 10px; margin: 0 -10px;
+    border-radius: 12px; color: var(--text); text-decoration: none;
+  }
+  a.item:hover { background: color-mix(in srgb, var(--primary) 9%, transparent); }
+  .item.off { opacity: .62; }
+  .ico { font-size: 22px; width: 28px; text-align: center; }
+  .txt { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+  .name { font-weight: 600; }
+  .sum { font-size: 13px; color: var(--muted); }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .dot.live { background: var(--live); }
+  .dot.beta { background: var(--beta); }
+  .dot.soon { background: transparent; border: 2px solid var(--soon); }
+  .tag { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .legend { display: flex; gap: 14px; margin: 14px 0 4px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+  .legend > span { display: inline-flex; align-items: center; gap: 6px; }
+
+  /* Desktop = dropdown under header */
+  @media (min-width: 1024px) {
+    .sheet {
+      inset: calc(var(--header-h) + 8px) max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter))) auto auto;
+      width: 380px; max-height: calc(100dvh - var(--header-h) - 32px);
+      border-bottom: 1px solid var(--border); border-radius: var(--radius); padding: 4px 18px 14px;
+    }
+    .sheet::backdrop { background: transparent; }
+    .handle { display: none; }
+  }
+</style>

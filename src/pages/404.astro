@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Page not found — Kanaksan" description="This page does not exist." path="/404" noindex>
+  <section class="wrap nf">
+    <h1>Page not found</h1>
+    <p>The page you are looking for does not exist.</p>
+    <p><a class="btn" href="/">Go to home</a></p>
+  </section>
+</Base>
+
+<style>
+  .nf { text-align: center; padding-block: 64px; }
+  .nf h1 { font-size: clamp(26px, 6vw, 36px); margin: 0 0 8px; }
+  .nf p { color: var(--muted); }
+</style>

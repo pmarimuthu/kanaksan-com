@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+import Spotlight from '../components/Spotlight.astro';
+import { resolveSpotlight } from '../lib/spotlight';
+import spotlightConfig from '../config/spotlight.json';
+
+// Phase 1: local config file. Phase 2: Firebase Remote Config (server-side), same resolver.
+const spotlight = resolveSpotlight(spotlightConfig);
+---
+<Base>
+  {spotlight.kind === 'content' && (
+    <link slot="head" rel="preload" as="image" href={spotlight.srcMobile ?? spotlight.src} fetchpriority="high" />
+  )}
+  <Spotlight data={spotlight} />
+</Base>

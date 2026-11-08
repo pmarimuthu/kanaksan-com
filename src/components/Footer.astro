@@ -1,0 +1,44 @@
+---
+import products from '../data/products.json';
+const live = products.groups.flatMap((g) => g.items).filter((i) => i.status !== 'soon' && i.url);
+const year = new Date().getFullYear();
+---
+<footer class="ftr">
+  <div class="wrap cols">
+    <p class="about">
+      <strong>Kanaksan</strong> is a suite of simple, free web apps for students and developers,
+      built in Bengaluru by <a href={products.profiles.author}>Marimuthu Periyannan</a>.
+    </p>
+    <nav aria-label="Apps">
+      <ul>{live.map((a) => <li><a href={a.url}>{a.name}</a></li>)}</ul>
+    </nav>
+    <nav aria-label="Connect">
+      <ul>
+        <li><a href={products.profiles.github} rel="me">GitHub</a></li>
+        <li><a href={products.profiles.linkedin} rel="me">LinkedIn</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap legal">© {year} Kanaksan</div>
+</footer>
+
+<style>
+  .ftr {
+    border-top: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: 14px;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .cols { display: grid; gap: 14px; padding-block: 22px 10px; }
+  .about { margin: 0; max-width: 52ch; }
+  .about strong { color: var(--text); }
+  ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 18px; }
+  a { color: var(--muted); }
+  a:hover { color: var(--text); }
+  nav a { display: inline-flex; align-items: center; min-height: 44px; }
+  .legal { padding-block: 4px 18px; font-size: 13px; }
+  @media (min-width: 1024px) {
+    .cols { grid-template-columns: 2fr 1fr 1fr; align-items: start; padding-block: 28px 8px; }
+    ul { flex-direction: column; }
+    nav a { min-height: 32px; }
+  }
+</style>
