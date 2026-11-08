@@ -6,10 +6,34 @@ import spotlightConfig from '../config/spotlight.json';
 
 // Phase 1: local config file. Phase 2: Firebase Remote Config (server-side), same resolver.
 const spotlight = resolveSpotlight(spotlightConfig);
+// href must match the preload type: with AVIF, use an AVIF candidate (the 960w one if present).
+const avifHref = (srcset?: string) => {
+  if (!srcset) return undefined;
+  const urls = srcset.split(',').map((p) => p.trim().split(/\s+/));
+  return (urls.find((u) => u[1] === '960w') ?? urls[0])[0];
+};
+const preload =
+  spotlight.kind === 'content'
+    ? {
+        href: avifHref(spotlight.srcsetAvif) ?? spotlight.src,
+        type: spotlight.srcsetAvif ? 'image/avif' : undefined,
+        srcset: spotlight.srcsetAvif ?? spotlight.srcset,
+        sizes: spotlight.srcsetAvif || spotlight.srcset ? spotlight.sizes : undefined,
+      }
+    : null;
 ---
 <Base>
-  {spotlight.kind === 'content' && (
-    <link slot="head" rel="preload" as="image" href={spotlight.srcMobile ?? spotlight.src} fetchpriority="high" />
+  {preload && (
+    <link
+      slot="head"
+      rel="preload"
+      as="image"
+      href={preload.href}
+      type={preload.type}
+      imagesrcset={preload.srcset}
+      imagesizes={preload.sizes}
+      fetchpriority="high"
+    />
   )}
   <Spotlight data={spotlight} />
 </Base>

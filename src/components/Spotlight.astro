@@ -8,7 +8,6 @@ import type { Spotlight } from '../lib/spotlight';
 
 interface Props { data: Spotlight }
 const { data } = Astro.props;
-const hasMobile = data.kind === 'content' && !!data.srcMobile;
 ---
 <section class="spot wrap" aria-label="Spotlight">
   {data.kind === 'content' ? (
@@ -16,17 +15,21 @@ const hasMobile = data.kind === 'content' && !!data.srcMobile;
       <h1 class="sr-only">Kanaksan — simple, free tools for students &amp; developers</h1>
       {(() => {
         const pic = (
-          <picture class:list={['frame', { m: hasMobile }]}>
-            {hasMobile && <source media="(min-width: 1024px)" srcset={data.src} />}
+          <picture class="frame">
+            {data.srcsetAvif && <source type="image/avif" srcset={data.srcsetAvif} sizes={data.sizes} />}
             <img
-              src={hasMobile ? data.srcMobile : data.src}
+              src={data.src}
+              srcset={data.srcset}
+              sizes={data.srcset ? data.sizes : undefined}
               alt={data.alt}
-              width="1600" height="900"
-              fetchpriority="high" decoding="async"
+              width={data.width}
+              height={data.height}
+              fetchpriority="high"
+              decoding="async"
             />
           </picture>
         );
-        return data.link ? <a href={data.link}>{pic}</a> : pic;
+        return data.link ? <a class="frame-link" href={data.link}>{pic}</a> : pic;
       })()}
       {data.caption && <figcaption>{data.caption}</figcaption>}
     </figure>
@@ -74,14 +77,16 @@ const hasMobile = data.kind === 'content' && !!data.srcMobile;
   @media (min-width: 1024px) { .spot { padding-block: 40px 48px; } }
 
   /* Content state */
-  .frame-wrap { margin: 0; }
-  .frame {
-    display: block; width: 100%; aspect-ratio: 16 / 9; overflow: hidden;
+  /* Content state: image keeps its own shape (width/height attributes reserve the space: CLS 0). */
+  .frame-wrap { margin: 0; display: flex; flex-direction: column; align-items: center; }
+  .frame, .frame-link { display: block; }
+  .frame img {
+    width: auto; height: auto; max-width: 100%;
     border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow);
   }
-  .frame.m { aspect-ratio: 4 / 5; }
-  @media (min-width: 1024px) { .frame.m { aspect-ratio: 16 / 9; } }
-  .frame img { width: 100%; height: 100%; object-fit: contain; }
+  @media (min-width: 1024px) {
+    .frame img { max-height: calc(100dvh - var(--header-h) - 150px); }
+  }
   figcaption { margin-top: 14px; text-align: center; font-size: clamp(18px, 4.5vw, 24px); font-weight: 700; }
 
   /* Fallback state */

@@ -10,7 +10,11 @@
 export type SpotlightContent = {
   kind: 'content';
   src: string;
-  srcMobile?: string;
+  srcset?: string;
+  srcsetAvif?: string;
+  sizes: string;
+  width: number;
+  height: number;
   alt: string;
   caption?: string;
   link?: string;
@@ -19,6 +23,21 @@ export type SpotlightContent = {
 export type SpotlightFallback = { kind: 'fallback'; reason: string };
 
 export type Spotlight = SpotlightContent | SpotlightFallback;
+
+const DEFAULT_SIZES = '(min-width: 1024px) 560px, calc(100vw - 32px)';
+
+/** https URL, or a site-relative path like /spotlight/x.webp (not protocol-relative //). */
+const isImageUrl = (v: unknown): v is string => {
+  if (typeof v !== 'string') return false;
+  const s = v.trim();
+  if (s === '') return false;
+  if (s.startsWith('/') && !s.startsWith('//')) return !/[\s"'<>]/.test(s);
+  try {
+    return new URL(s).protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
 
 const isHttpsUrl = (v: unknown): v is string => {
   if (typeof v !== 'string' || v.trim() === '') return false;
@@ -29,8 +48,24 @@ const isHttpsUrl = (v: unknown): v is string => {
   }
 };
 
+/** srcset like "/a-480.webp 480w, /a-960.webp 960w"; every candidate URL must be valid. */
+const validSrcset = (v: unknown): string | undefined => {
+  if (typeof v !== 'string' || v.trim() === '') return undefined;
+  const parts = v.split(',').map((p) => p.trim()).filter(Boolean);
+  if (parts.length === 0) return undefined;
+  for (const p of parts) {
+    const [url, descriptor, extra] = p.split(/\s+/);
+    if (extra !== undefined || !isImageUrl(url)) return undefined;
+    if (descriptor !== undefined && !/^\d+(\.\d+)?[wx]$/.test(descriptor)) return undefined;
+  }
+  return parts.join(', ');
+};
+
 const optText = (v: unknown, max = 200): string | undefined =>
   typeof v === 'string' && v.trim() !== '' ? v.trim().slice(0, max) : undefined;
+
+const posInt = (v: unknown): number | undefined =>
+  typeof v === 'number' && Number.isInteger(v) && v > 0 && v <= 10000 ? v : undefined;
 
 export function resolveSpotlight(raw: unknown, now: Date = new Date()): Spotlight {
   let data: unknown = raw;
@@ -52,9 +87,9 @@ export function resolveSpotlight(raw: unknown, now: Date = new Date()): Spotligh
 
   if (d.type === 'none') return { kind: 'fallback', reason: 'disabled' };
   if (d.type !== 'image') return { kind: 'fallback', reason: 'unsupported-type' };
-  if (!isHttpsUrl(d.src)) return { kind: 'fallback', reason: 'invalid-src' };
+  if (!isImageUrl(d.src)) return { kind: 'fallback', reason: 'invalid-src' };
 
-  const alt = optText(d.alt, 160);
+  const alt = optText(d.alt, 200);
   if (!alt) return { kind: 'fallback', reason: 'missing-alt' };
 
   const start = typeof d.startAt === 'string' && d.startAt ? Date.parse(d.startAt) : NaN;
@@ -64,8 +99,12 @@ export function resolveSpotlight(raw: unknown, now: Date = new Date()): Spotligh
 
   return {
     kind: 'content',
-    src: d.src,
-    srcMobile: isHttpsUrl(d.srcMobile) ? d.srcMobile : undefined,
+    src: d.src.trim(),
+    srcset: validSrcset(d.srcset),
+    srcsetAvif: validSrcset(d.srcsetAvif),
+    sizes: optText(d.sizes, 200) ?? DEFAULT_SIZES,
+    width: posInt(d.width) ?? 1600,
+    height: posInt(d.height) ?? 900,
     alt,
     caption: optText(d.caption, 120),
     link: isHttpsUrl(d.link) ? d.link : undefined,

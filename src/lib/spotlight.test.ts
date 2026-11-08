@@ -42,6 +42,26 @@ for (const [name, input] of fallbacks) {
   });
 }
 
+test('site-relative src is accepted', () => {
+  assert.equal(resolveSpotlight({ ...good, src: '/spotlight/a.webp' }, now).kind, 'content');
+});
+
+test('protocol-relative src falls back', () => {
+  assert.equal(resolveSpotlight({ ...good, src: '//evil.com/a.webp' }, now).kind, 'fallback');
+});
+
+test('valid srcset kept, bad srcset dropped', () => {
+  const ok = resolveSpotlight({ ...good, srcset: '/a-480.webp 480w, https://x.com/a-960.webp 960w' }, now);
+  assert.equal(ok.kind === 'content' && ok.srcset, '/a-480.webp 480w, https://x.com/a-960.webp 960w');
+  const bad = resolveSpotlight({ ...good, srcset: '/a.webp 480w, javascript:x 960w' }, now);
+  assert.equal(bad.kind === 'content' && bad.srcset, undefined);
+});
+
+test('width/height default when missing or invalid', () => {
+  const r = resolveSpotlight({ ...good, width: -5, height: 'x' }, now);
+  assert.ok(r.kind === 'content' && r.width === 1600 && r.height === 900);
+});
+
 test('bad optional link is dropped, content still shown', () => {
   const r = resolveSpotlight({ ...good, link: 'javascript:alert(1)' }, now);
   assert.equal(r.kind, 'content');
