@@ -24,7 +24,14 @@ export type SpotlightFallback = { kind: 'fallback'; reason: string };
 
 export type Spotlight = SpotlightContent | SpotlightFallback;
 
-const DEFAULT_SIZES = '(min-width: 1024px) 560px, calc(100vw - 32px)';
+/**
+ * `sizes` hint matching the CSS: the image fills the width on tall/narrow screens
+ * and fits the height on wide/short screens (see Spotlight.astro).
+ */
+export function spotlightSizes(width: number, height: number): string {
+  const ar = (width / height).toFixed(4);
+  return `(max-aspect-ratio: ${width}/${height}) calc(100vw - 32px), calc((100vh - 112px) * ${ar})`;
+}
 
 /** https URL, or a site-relative path like /spotlight/x.webp (not protocol-relative //). */
 const isImageUrl = (v: unknown): v is string => {
@@ -102,9 +109,9 @@ export function resolveSpotlight(raw: unknown, now: Date = new Date()): Spotligh
     src: d.src.trim(),
     srcset: validSrcset(d.srcset),
     srcsetAvif: validSrcset(d.srcsetAvif),
-    sizes: optText(d.sizes, 200) ?? DEFAULT_SIZES,
     width: posInt(d.width) ?? 1600,
     height: posInt(d.height) ?? 900,
+    sizes: optText(d.sizes, 200) ?? spotlightSizes(posInt(d.width) ?? 1600, posInt(d.height) ?? 900),
     alt,
     caption: optText(d.caption, 120),
     link: isHttpsUrl(d.link) ? d.link : undefined,

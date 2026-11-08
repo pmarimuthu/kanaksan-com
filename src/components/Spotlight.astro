@@ -8,6 +8,8 @@ import type { Spotlight } from '../lib/spotlight';
 
 interface Props { data: Spotlight }
 const { data } = Astro.props;
+// Image ratio drives the fit-to-window size in CSS (works for portrait and landscape).
+const ar = data.kind === 'content' ? (data.width / data.height).toFixed(4) : '1';
 ---
 <section class="spot wrap" aria-label="Spotlight">
   {data.kind === 'content' ? (
@@ -24,6 +26,7 @@ const { data } = Astro.props;
               alt={data.alt}
               width={data.width}
               height={data.height}
+              style={`--ar:${ar}`}
               fetchpriority="high"
               decoding="async"
             />
@@ -73,19 +76,22 @@ const { data } = Astro.props;
 </section>
 
 <style>
-  .spot { flex: 1; display: flex; flex-direction: column; justify-content: center; padding-block: 20px 28px; }
-  @media (min-width: 1024px) { .spot { padding-block: 40px 48px; } }
+  .spot { flex: 1; display: flex; flex-direction: column; justify-content: center; }
 
   /* Content state */
-  /* Content state: image keeps its own shape (width/height attributes reserve the space: CLS 0). */
-  .frame-wrap { margin: 0; display: flex; flex-direction: column; align-items: center; }
-  .frame, .frame-link { display: block; }
+  /* Content state: the image always fits inside the window — full width on tall
+     screens, full available height on wide/short screens — and resizes live with
+     the window. width/height attributes keep the ratio, so nothing jumps (CLS 0). */
+  .spot { --pad-top: 20px; --pad-bot: 28px; padding-block: var(--pad-top) var(--pad-bot); }
+  @media (min-width: 1024px) { .spot { --pad-top: 40px; --pad-bot: 48px; } }
+  .frame-wrap { margin: 0; }
+  .frame, .frame-link { display: block; width: 100%; }
   .frame img {
-    width: auto; height: auto; max-width: 100%;
+    --avail-h: calc(100dvh - var(--header-h) - var(--pad-top) - var(--pad-bot));
+    width: min(100%, max(240px, calc(var(--avail-h) * var(--ar))));
+    height: auto;
+    margin-inline: auto;
     border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow);
-  }
-  @media (min-width: 1024px) {
-    .frame img { max-height: calc(100dvh - var(--header-h) - 150px); }
   }
   figcaption { margin-top: 14px; text-align: center; font-size: clamp(18px, 4.5vw, 24px); font-weight: 700; }
 
