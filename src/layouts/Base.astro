@@ -2,12 +2,15 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import products from '../data/products.json';
+import type { SuiteStats } from '../lib/pulse';
+import { HUB_APP_ID } from '../lib/apps';
 
 interface Props {
   title?: string;
   description?: string;
   path?: string;
   noindex?: boolean;
+  stats?: SuiteStats | null;
 }
 
 const SITE = 'https://kanaksan.com';
@@ -16,6 +19,7 @@ const {
   description = 'Kanaksan is a suite of simple, free web apps: Students’ Companion for Class 11 Physics, a Tamil daily calendar with panchangam, and more tools for students and developers.',
   path = '/',
   noindex = false,
+  stats = null,
 } = Astro.props;
 
 const canonical = new URL(path, SITE).toString();
@@ -83,8 +87,11 @@ const jsonLd = {
     <a class="skip" href="#main">Skip to content</a>
     <Header />
     <main id="main"><slot /></main>
-    <Footer />
+    <Footer stats={stats} />
     <script is:inline>(function(){var b=document.getElementById('theme-toggle');if(!b)return;b.addEventListener('click',function(){var r=document.documentElement,c=r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'),n=c==='dark'?'light':'dark';r.dataset.theme=n;try{localStorage.setItem('theme',n)}catch(e){}})})()</script>
+    <!-- pulse visitor tracking: loaded only after the page has fully loaded and the browser is idle,
+         so it never affects page speed. It skips itself if this visitor was already counted today. -->
+    <script is:inline define:vars={{ pulseApp: HUB_APP_ID }}>addEventListener('load',function(){var go=function(){var s=document.createElement('script');s.src='https://pulse.kanaksan.com/tracker.js';s.setAttribute('data-app',pulseApp);s.async=true;document.body.appendChild(s)};'requestIdleCallback' in window?requestIdleCallback(go,{timeout:5000}):setTimeout(go,2000)})</script>
   </body>
 </html>
 

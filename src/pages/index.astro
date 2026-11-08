@@ -2,10 +2,19 @@
 import Base from '../layouts/Base.astro';
 import Spotlight from '../components/Spotlight.astro';
 import { resolveSpotlight } from '../lib/spotlight';
+import { fetchSuiteStats } from '../lib/pulse';
+import { pulseAppIds } from '../lib/apps';
 import spotlightConfig from '../config/spotlight.json';
 
-// Phase 1: local config file. Phase 2: Firebase Remote Config (server-side), same resolver.
+// Rendered on the server and cached (ISR, 5 min) — see astro.config.mjs.
+export const prerender = false;
+
+// Spotlight: local config for now; Firebase Remote Config next, same resolver.
 const spotlight = resolveSpotlight(spotlightConfig);
+
+// Visitor counts for all apps combined, from pulse. null → the footer simply hides them.
+const stats = await fetchSuiteStats(pulseAppIds());
+
 // href must match the preload type: with AVIF, use an AVIF candidate (the 960w one if present).
 const avifHref = (srcset?: string) => {
   if (!srcset) return undefined;
@@ -22,7 +31,7 @@ const preload =
       }
     : null;
 ---
-<Base>
+<Base stats={stats}>
   {preload && (
     <link
       slot="head"

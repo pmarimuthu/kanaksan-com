@@ -1,5 +1,9 @@
 ---
 import products from '../data/products.json';
+import { formatCount, type SuiteStats } from '../lib/pulse';
+
+interface Props { stats?: SuiteStats | null }
+const { stats = null } = Astro.props;
 const live = products.groups.flatMap((g) => g.items).filter((i) => i.status !== 'soon' && i.url);
 const year = new Date().getFullYear();
 ---
@@ -20,7 +24,14 @@ const year = new Date().getFullYear();
       </ul>
     </nav>
   </div>
-  <div class="wrap legal">© {year} Kanaksan</div>
+  <div class="wrap legal">
+    <span>© {year} Kanaksan</span>
+    {stats && (
+      <span class="count" title="Across all Kanaksan apps · updated every few minutes">
+        {formatCount(stats.total)} visits · {formatCount(stats.unique)} unique visitors
+      </span>
+    )}
+  </div>
 </footer>
 
 <style>
@@ -35,7 +46,8 @@ const year = new Date().getFullYear();
   a { color: var(--muted); }
   a:hover { color: var(--text); }
   nav a { display: inline-flex; align-items: center; min-height: 44px; }
-  .legal { padding-block: 4px 18px; font-size: 13px; }
+  .legal { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; padding-block: 4px 18px; font-size: 13px; }
+  .count { font-variant-numeric: tabular-nums; }
   @media (min-width: 1024px) {
     .cols { grid-template-columns: 2fr 1fr 1fr; align-items: start; padding-block: 28px 8px; }
     ul { flex-direction: column; }
