@@ -51,7 +51,7 @@ Main hub for the Kanaksan suite. Mobile-first, static HTML, near-zero JavaScript
   has a bad `src`, has no `alt`, or is outside the `startAt`–`endAt` window.
 - The decision is made on the server, so the browser never sees a loading state or a swap.
 - Phase 1 note: the site is static, so `startAt` / `endAt` are checked at build time.
-  Phase 2 (ISR) checks them on every refresh.
+  With ISR (1 minute) they are checked on every refresh.
 
 ## Roadmap
 
